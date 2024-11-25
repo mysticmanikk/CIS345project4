@@ -1,5 +1,8 @@
 # CIS345project4
+
 Purpose
+---------
+
 The objective of this project is to implement and optimize the FAXPY function using CUDA programming to gain familiarity with parallel processing on GPUs. The FAXPY function computes the result as:
 result[i] = 𝑎*x[i] + y[i]
 where x, y, result, and a are all single-precision floating-point values.
