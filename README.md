@@ -17,7 +17,7 @@ Contributions:
 ----------------
 In this group project, the breakdown would be:
 
-([Manikdeep Kaur LNU]: 55% and [John Mendicino]: 45%) contribution to all aspects of the project, including CUDA kernel implementation, debugging, and performance evaluation.
+([Manikdeep Kaur LNU-2855864]: 55% and [John Mendicino-CSU ID]: 45%) contribution to all aspects of the project, including CUDA kernel implementation, debugging, and performance evaluation.
 
 Design Details
 --------------
