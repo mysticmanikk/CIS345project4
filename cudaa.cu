@@ -73,12 +73,20 @@ float toBW(int bytes, float sec) {
 __global__ void faxpy_1blk_kernel(int N, float alpha, float *x, float *y, float *result) {
     // TODO insert your CUDA kernel code here
     // TODO one block of threads
+   int i = threadIdx.x; // Single block, thread ID is global index
+    if (i < N) {
+        result[i] = alpha * x[i] + y[i];
+    }
 }
 
 __global__ void faxpy_mblk_kernel(int N, float alpha, float* x, float* y, float* result) {
 
     // TODO insert your CUDA kernel code here
     // TODO multi-blocks of threads
+    int i = blockIdx.x * blockDim.x + threadIdx.x; // Calculate global thread index
+    if (i < N) {
+        result[i] = alpha * x[i] + y[i];
+    }
 }
 
 void faxpyCuda(int N, float alpha, float* xarray, float* yarray, float* resultarray) {
@@ -95,7 +103,9 @@ void faxpyCuda(int N, float alpha, float* xarray, float* yarray, float* resultar
 
     //
     // TODO allocate device memory buffers on the GPU using cudaMalloc
-    //
+    cudaMalloc((void**)&device_x, N * sizeof(float));
+    cudaMalloc((void**)&device_y, N * sizeof(float));
+    cudaMalloc((void**)&device_result, N * sizeof(float));
 
 
     // start timing after allocation of device memory
@@ -103,13 +113,18 @@ void faxpyCuda(int N, float alpha, float* xarray, float* yarray, float* resultar
 
     //
     // TODO copy input arrays to the GPU using cudaMemcpy
-    //
+    cudaMemcpy(device_x, xarray, N * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpy(device_y, yarray, N * sizeof(float), cudaMemcpyHostToDevice);
+
 
     double midTime1 = currentSeconds();
 
     //
     // TODO run kernel, either 1-block kernel or multi-block kernel
-    //
+    // Uncomment the one you want to test:
+    // faxpy_1blk_kernel<<<1, N>>>(N, alpha, device_x, device_y, device_result);
+    faxpy_mblk_kernel<<<blocks, threadsPerBlock>>>(N, alpha, device_x, device_y, device_result);
+
 
     // IMPORTANT, wait for the completion at GPU
     cudaDeviceSynchronize();
@@ -118,7 +133,8 @@ void faxpyCuda(int N, float alpha, float* xarray, float* yarray, float* resultar
 
     //
     // TODO copy result from GPU using cudaMemcpy
-    //
+    cudaMemcpy(resultarray, device_result, N * sizeof(float), cudaMemcpyDeviceToHost);
+
 
     // end timing after result has been copied back into host memory
     double endTime = currentSeconds();
@@ -138,6 +154,9 @@ void faxpyCuda(int N, float alpha, float* xarray, float* yarray, float* resultar
     printf("GPU computation duration %.3f ms\n", 1000.f * gpu_compute_dur);
 
     // TODO free memory buffers on the GPU
+    cudaFree(device_x);
+    cudaFree(device_y);
+    cudaFree(device_result);
 
 }
 
